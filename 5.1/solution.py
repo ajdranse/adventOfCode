@@ -26,7 +26,6 @@ with open ('input') as f:
         for c in line:
             polymerChain.append(c)
 
-print("Starting length: {}".format(len(polymerChain)))
 iterations = 0
 removed = removeOpposite()
 while removed:
