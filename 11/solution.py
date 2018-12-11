@@ -10,11 +10,7 @@ for x in xrange(300):
 def block_power(start_x, start_y, grid_size):
     ret = 0
     for y in xrange(start_y, start_y+grid_size):
-        if y > 299:
-            return None
         for x in xrange(start_x, start_x+grid_size):
-            if x > 299:
-                return None
             cur_power = power_levels[(x, y)]
             ret += cur_power
     return ret
@@ -23,8 +19,8 @@ print("Part 1")
 start_x = 0
 start_y = 0
 max_power = 0
-for x in xrange(300):
-    for y in xrange(300):
+for x in range(298):
+    for y in range(298):
         power = block_power(x, y, 3)
         if power > max_power:
             start_x = x
@@ -39,8 +35,8 @@ max_power = 0
 grid_size = 0
 for i in xrange(1, 300):
     print("Checking grid size {}".format(i))
-    for x in xrange(300):
-        for y in xrange(300):
+    for x in xrange(300 - i):
+        for y in xrange(300 - i):
             power = block_power(x, y, i)
             if power > max_power:
                 start_x = x
