@@ -1,7 +1,6 @@
 def get_power_level(x, y, serial_no):
     intermediate = ((((x+10) * y) + serial_no) * (x+10))
-    hundreds = int(str(intermediate / 100)[-1])
-    return hundreds - 5
+    return ((intermediate // 100) % 10) - 5
 
 power_levels = {}
 for x in xrange(300):
