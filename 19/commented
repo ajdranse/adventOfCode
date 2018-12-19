@@ -1,0 +1,73 @@
+0 r1 = r1 + 16    jump to 17
+
+1 r3 = 1
+2 r5 = 1
+3 r2 = r3 * r5
+4 r2 = 1 if r2 == r4 else 0                   if r3 * r5 == r4 jump 7
+5 r1 = r2 + r1                                else jump 8
+6 r1 = r1 + 1
+7 r0 = r3 + r0                                r0 += r3
+8 r5 = r5 + 1                                 r5 += 1
+9 r2 = 1 if r5 > r4 else 0                    if r5 > r4 jump to 12
+10 r1 = r1 + r2                               else jump to 3
+11 r1 = 2
+12 r3 = r3 + 1                                r3 += 1
+13 r2 = 1 if r3 > r4 else 0
+14 r1 = r2 + r1                               if r3 > r4 jump to 16
+15 r1 = 1                                     else jump 2
+16 r1 = r1 * r1                               jump out of program (END)
+
+
+17 r4 = r4 + 2
+18 r4 = r4 * r4
+19 r4 = r1 * r4
+20 r4 = r4 * 11
+21 r2 = r2 + 6
+22 r2 = r2 * r1
+23 r2 = r2 + 2
+24 r4 = r4 + r2   r4 = ((2 * 2) * 19 * 11) + ((6 * 22) + 2) = 836 + 134 = 970
+25 r1 = r1 + r0   jump to 27 (part 2)
+26 r1 = 0         jump to 1  (part 1)
+27 r2 = r1
+28 r2 = r2 * r1
+29 r2 = r1 + r2
+30 r2 = r1 * r2
+31 r2 = r2 * 14
+32 r2 = r2 * r1  r2 = (((27 * 28) + 29) * 30) * 14 * 32 = 10550400
+33 r4 = r4 + r2  r4 = 970 + 10550400 = 10551370
+34 r0 = 0        r0 = 0
+35 r1 = 0        jump to 1
+
+
+part 2 [0, 1, 0, 10551370, 0]
+
+r3 = 1
+outer_loop_start:
+r5 = 1
+inner_loop_start:
+if r3 * r5 == r4:
+  r0 += r3
+r5 += 1
+
+if r5 > r4:
+  r3 += 1
+else:
+  goto inner_loop_start
+
+if r3 > r4:
+  exit
+else:
+  goto outer_loop_start
+
+r3 = 1
+while r3 <= r4:
+  r5 = 1
+  while r5 <= r4:
+    if r3 * r5 == r4:
+      r0 += r3
+    r5 += 1
+  r3 += 1
+
+what are we doing here...for every pair of numbers r3, r5 <= r4, if they, multiplied together are r4, add r3 to r0
+since this loop runs for 1 <= r3 <= r4 and 1 <= r5 <= r4, basically we are adding every single divisor of r4 to r0
+so just do a loop from 1 to r4 to see if a number is a divisor of it
