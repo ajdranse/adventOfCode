@@ -2,14 +2,14 @@ lines = []
 with open('input') as f:
     lines = f.read().splitlines()
 
-print('part 1');
+print('part 1')
 sum = 0
 for mass in lines:
     fuel = int(int(mass) / 3) - 2
     sum += fuel
 print(sum)
 
-print('part 2');
+print('part 2')
 sum = 0
 for mass in lines:
     fuel = int(int(mass) / 3) - 2
