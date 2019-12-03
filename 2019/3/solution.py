@@ -3,33 +3,17 @@ def points(wire):
     x = 0
     y = 0
     steps = 0
+    x_mod = {'R': 1, 'L': -1, 'U': 0, 'D': 0}
+    y_mod = {'R': 0, 'L': 0, 'U': 1, 'D': -1}
     for step in wire:
         direction = step[0]
         distance = int(step[1:])
-        if direction == 'R':
-            for _ in range(distance):
-                x += 1
-                steps += 1
-                if (x, y) not in points:
-                    points[(x, y)] = steps
-        elif direction == 'L':
-            for _ in range(distance):
-                x -= 1
-                steps += 1
-                if (x, y) not in points:
-                    points[(x, y)] = steps
-        elif direction == 'U':
-            for _ in range(distance):
-                y += 1
-                steps += 1
-                if (x, y) not in points:
-                    points[(x, y)] = steps
-        elif direction == 'D':
-            for _ in range(distance):
-                y -= 1
-                steps += 1
-                if (x, y) not in points:
-                    points[(x, y)] = steps
+        for _ in range(distance):
+            x += x_mod[direction]
+            y += y_mod[direction]
+            steps += 1
+            if (x, y) not in points:
+                points[(x, y)] = steps
     return points
 
 
