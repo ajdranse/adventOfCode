@@ -1,12 +1,9 @@
-input_low = 168630
-input_high = 718098
-
 part1 = []
 part2 = []
-for x in range(input_low, input_high+1):
+for x in range(168630, 718098+1):
     # two adjacent are the same
     # never decrease
-    # not all repeated digits are repeated more than twice
+    # part 2: not all repeated digits are repeated more than twice
     digits = [int(d) for d in str(x)]
     increasing = True
     doubles = {}
