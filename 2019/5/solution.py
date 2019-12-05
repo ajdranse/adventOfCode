@@ -1,10 +1,17 @@
 def run(memory, input_val):
     ip = 0
     while True:
-        raw = memory[ip]
-        opcode = raw % 100
-        raw -= opcode
-        modes = [raw in [11100, 10100, 1100, 100], raw in [11100, 11000, 1100, 1000], raw in [11100, 11000, 10100, 10000]]  # noqa
+        opcode = memory[ip]
+        modes = []
+        if opcode > 100:
+            raw_modes = int(opcode / 100)
+            opcode = opcode % 100
+            while raw_modes > 0:
+                modes.append(raw_modes % 10)
+                raw_modes = int(raw_modes / 10)
+        while len(modes) < 4:
+            modes.append(0)
+
         if opcode == 1:  # add
             first = memory[ip+1] if modes[0] else memory[memory[ip+1]]
             second = memory[ip+2] if modes[1] else memory[memory[ip+2]]
