@@ -1,4 +1,0 @@
-[3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9] gives:
-input 8 to 12 giving memory [3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, 8, 0, 1, 9]
-jump-if-false with 8, ip is now: 4
-Error, unknown opcode: 15
