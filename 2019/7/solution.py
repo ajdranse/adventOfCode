@@ -1,8 +1,9 @@
 import itertools
+from queue import Queue
+from threading import Thread
 
 
-def run(memory, input_val):
-    outputs = []
+def run(memory, i, input_queue, output_queue):
     ip = 0
     while True:
         opcode = memory[ip]
@@ -27,12 +28,11 @@ def run(memory, input_val):
             memory[memory[ip+3]] = first * second
             ip += 4
         elif opcode == 3:  # input
-            memory[memory[ip+1]] = input_val
-            inputs_taken += 1
+            memory[memory[ip+1]] = input_queue.get(True)
             ip += 2
         elif opcode == 4:  # output
             first = ip+1 if modes[0] else memory[ip+1]
-            outputs.append(memory[first])
+            output_queue.put(memory[first])
             ip += 2
         elif opcode == 5:  # jump-if-true
             first = memory[ip+1] if modes[0] else memory[memory[ip+1]]
@@ -59,44 +59,62 @@ def run(memory, input_val):
             memory[memory[ip+3]] = 1 if first == second else 0
             ip += 4
         elif opcode == 99:  # exit
-            return outputs
+            return
         else:
             print('Error, unknown opcode: {}'.format(opcode))
             raise
 
 
-# test = [
-#     [3, 15, 3, 16, 1002, 16, 10, 16, 1, 16, 15, 15, 4, 15, 99, 0, 0]
-# ]
-# for case in test:
-#     signal = 0
-#     for i in [4, 3, 2, 1, 0]:
-#         print('calling with inputs {} and {}'.format(i, signal))
-#         signal = run(case.copy(), [i, signal])[0]
-#     print(signal)
-
-with open('input') as f:
-    memory = [int(x.strip()) for x in f.read().split(',')]
-    print('part 1')
+def part1(memory):
     max_signal = 0
     max_order = []
     for order in itertools.permutations([0, 1, 2, 3, 4], 5):
         signal = 0
+        input_queue = Queue()
+        output_queue = Queue()
         for i in order:
-            signal = run(memory.copy(), [i, signal])[0]
+            input_queue.put(i)
+            input_queue.put(signal)
+            cur_thread = Thread(target=run, args=(memory.copy(), i, input_queue, output_queue))
+            cur_thread.start()
+            cur_thread.join()
+            signal = output_queue.get()
+
         if signal > max_signal:
             max_signal = signal
             max_order = order
     print(max_order, max_signal)
 
-#     print('part 2')
-#     max_signal = 0
-#     max_order = []
-#     for order in itertools.permutations([5, 6, 7, 8, 9], 5):
-#         signal = 0
-#         for i in order:
-#             signal = run(memory.copy(), [i, signal])[0]
-#         if signal > max_signal:
-#             max_signal = signal
-#             max_order = order
-#     print(max_order, max_signal)
+
+def part2(memory):
+    max_signal = 0
+    max_order = []
+    for order in itertools.permutations([5, 6, 7, 8, 9], 5):
+        signal = 0
+        queues = [Queue() for _ in range(5)]
+        threads = []
+        for idx, phase in enumerate(order):
+            queues[idx].put(phase)
+            cur_thread = Thread(target=run, args=(memory.copy(), idx, queues[idx], queues[(idx + 1) % 5]))
+            threads.append(cur_thread)
+            cur_thread.start()
+
+        queues[0].put(0)
+        for t in threads:
+            t.join()
+
+        signal = queues[0].get()
+
+        if signal > max_signal:
+            max_signal = signal
+            max_order = order
+    print(max_order, max_signal)
+
+
+with open('input') as f:
+    memory = [int(x.strip()) for x in f.read().split(',')]
+    print('part 1')
+    part1(memory.copy())
+
+    print('part 2')
+    part2(memory.copy())
