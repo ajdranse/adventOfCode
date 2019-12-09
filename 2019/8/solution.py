@@ -5,20 +5,17 @@ with open('input') as f:
     nums = [int(x) for x in f.read().strip()]
 
 layers = []
-counters = []
+min_zeroes_layer = None
 layer = []
-for i, n in enumerate(nums):
+for n in nums:
     layer.append(n)
     if len(layer) == 25 * 6:
         layers.append(layer)
-        counters.append(Counter(sorted(layer)))
+        if min_zeroes_layer is None or Counter(layer)[0] < min_zeroes_layer[0]:
+            min_zeroes_layer = Counter(layer)
         layer = []
 
-min_layer = None
-for i, l in enumerate(counters):
-    if min_layer is None or l[0] < min_layer[0]:
-        min_layer = l
-print('part 1: {}'.format(min_layer[1] * min_layer[2]))
+print('part 1: {}'.format(min_zeroes_layer[1] * min_zeroes_layer[2]))
 
 final = []
 for i in range(150):
