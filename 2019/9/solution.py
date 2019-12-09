@@ -42,10 +42,14 @@ class IntCode(Thread):
     def get_addresses(self, count):
         ret = ()
         for i in range(count):
-            if self.modes[i]:
+            if self.modes[i] == 1:
                 ret += (self.ip+i+1, )
-            else:
+            elif self.modes[i] == 2:
+                ret += (self.get(self.ip+i+1) + self.relative_base, )
+            elif self.modes[i] == 0:
                 ret += (self.get(self.ip+i+1), )
+            else:
+                raise Exception('Unknown mode {}'.format(self.modes[i]))
         return ret
 
     def add(self):
@@ -65,7 +69,6 @@ class IntCode(Thread):
 
     def output(self):
         first = self.get_addresses(1)[0]
-        print('writing {}'.format(self.get(first)))
         self.output_queue.put(self.get(first))
         self.ip += 2
 
@@ -95,15 +98,13 @@ class IntCode(Thread):
 
     def update_relative_base(self):
         first = self.get_addresses(1)[0]
-        self.relative_base += first
+        self.relative_base += self.get(first)
         self.ip += 2
 
     def run(self):
-        print(self.memory)
         self.opcode = self.get(self.ip)
         while self.opcode != 99:
             self.parse_opcode()
-            print(self.modes, self.opcode)
             if self.opcode == 1:  # add
                 self.add()
             elif self.opcode == 2:  # mult
