@@ -1,65 +1,50 @@
 from queue import Queue
 from intcode import IntCode
 
-with open('input') as f:
-    memory = [int(x.strip()) for x in f.read().split(',')]
-    print('part 1')
+
+def print_grid(grid):
+    '''prints a grid, where the grid is a dict of (x, y) to 1/0 values.  1 is painted white, 0 is black.'''
+    outs = ''
+    for y in range(max(grid, key=lambda g: g[1])[1] + 1):
+        for x in range(max(grid, key=lambda g: g[0])[0] + 1):
+            if (x, y) in grid:
+                if grid[(x, y)]:
+                    outs += '##'
+                else:
+                    outs += '  '
+            else:
+                outs += '  '
+        outs += '\n'
+    print(outs)
+
+
+def run_robot(facing, pos, colour):
     inq = Queue()
     outq = Queue()
     robot = IntCode(memory.copy(), inq, outq)
     robot.start()
-    pos = (0, 0)
-    facing = 270
     grid = {}
-    grid[pos] = 1
-    inq.put(1)
+    grid[pos] = colour
+    inq.put(colour)
+    DX = {0: 1, 1: 0, 2: -1, 3: 0}
+    DY = {0: 0, 1: 1, 2: 0, 3: -1}
     while robot.is_alive():
         colour = outq.get()
         turn = outq.get()
         grid[pos] = colour
-        if turn:
-            facing = (facing + 90) % 360
-        else:
-            facing = (facing - 90) % 360
-        if facing == 0:
-            pos = (pos[0] + 1, pos[1])
-        elif facing == 90:
-            pos = (pos[0], pos[1] + 1)
-        elif facing == 180:
-            pos = (pos[0] - 1, pos[1])
-        elif facing == 270:
-            pos = (pos[0], pos[1] - 1)
-        if pos in grid:
-            inq.put(grid[pos])
-        else:
-            inq.put(0)
+        facing = (facing + (1 if turn else -1)) % 4
+        pos = (pos[0] + DX[facing], pos[1] + DY[facing])
+        inq.put(grid[pos] if pos in grid else 0)
+    return grid
 
-    robot.join()
-    print(len(grid))
+
+with open('input') as f:
+    memory = [int(x.strip()) for x in f.read().split(',')]
+    print('part 1')
+    grid = run_robot(3, (0, 0), 0)
+    print(len(grid.keys()))
 
     print('part 2')
-    x_min = 999
-    x_max = 0
-    y_min = 999
-    y_max = 0
-    for p in grid.keys():
-        if p[0] > x_max:
-            x_max = p[0]
-        if p[0] < x_min:
-            x_min = p[0]
-        if p[1] > y_max:
-            y_max = p[1]
-        if p[1] < y_min:
-            y_min = p[1]
-
-    for y in range(y_min, y_max+1):
-        outs = ''
-        for x in range(x_min, x_max+1):
-            if (x, y) in grid:
-                if grid[(x, y)]:
-                    outs += '#'
-                else:
-                    outs += '.'
-            else:
-                outs += '.'
-        print(outs)
+    grid = run_robot(3, (0, 0), 1)
+    print(len(grid.keys()))
+    print_grid(grid)
