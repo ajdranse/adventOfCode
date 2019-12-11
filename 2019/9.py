@@ -18,7 +18,7 @@ for test in tests:
         output.append(str(q.get()))
     print(','.join(output))
 
-with open('input') as f:
+with open('9.in') as f:
     memory = [int(x.strip()) for x in f.read().split(',')]
     print('part 1')
     inq = Queue()

@@ -66,9 +66,9 @@ def part2(filename, station):
         aim = 0
 
 
-# for i in ['test.1', 'test.2', 'test.3', 'test.4', 'test.5']:
+# for i in ['10.test.1', '10.test.2', '10.test.3', '10.test.4', '10.test.5']:
 #     print(i, part1(i))
 
-print('part1', part1('input')[0])
-res = part2('input', part1('input')[0])
+print('part1', part1('10.in')[0])
+res = part2('10.in', part1('10.in')[0])
 print('part2', res[0]*100 + res[1])

@@ -1,7 +1,7 @@
 from collections import Counter
 
 nums = []
-with open('input') as f:
+with open('8.in') as f:
     nums = [int(x) for x in f.read().strip()]
 
 layers = []

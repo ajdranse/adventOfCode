@@ -38,7 +38,7 @@ def run_robot(facing, pos, colour):
     return grid
 
 
-with open('input') as f:
+with open('11.in') as f:
     memory = [int(x.strip()) for x in f.read().split(',')]
     print('part 1')
     grid = run_robot(3, (0, 0), 0)

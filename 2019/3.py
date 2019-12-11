@@ -18,7 +18,7 @@ def points(wire):
 
 
 wires = []
-with open('input') as f:
+with open('3.in') as f:
     wires = [x.split(',') for x in f.read().splitlines()]
 
 points1 = points(wires[0])

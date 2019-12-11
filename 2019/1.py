@@ -1,5 +1,5 @@
 lines = []
-with open('input') as f:
+with open('1.in') as f:
     lines = f.read().splitlines()
 
 print('part 1')

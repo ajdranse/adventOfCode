@@ -33,7 +33,7 @@ def run2(code):
 #     run(case)
 #     print(f'{case}')
 memory = None
-with open('input') as f:
+with open('2.in') as f:
     memory = [int(x.strip()) for x in f.read().split(',')]
 part1 = memory.copy()
 part1[1] = 12

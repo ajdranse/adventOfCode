@@ -11,7 +11,7 @@ def build_tree(root, nodes, orbits):
 
 root = Node('COM')
 orbits = {}
-with open('input') as f:
+with open('6.in') as f:
     for x in f.read().splitlines():
         # AAA)BBB = BBB is in orbit around AAA
         orbit = x.split(')')

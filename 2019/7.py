@@ -49,7 +49,7 @@ def part2(memory):
     print(max_order, max_signal)
 
 
-with open('input') as f:
+with open('7.in') as f:
     memory = [int(x.strip()) for x in f.read().split(',')]
     print('part 1')
     part1(memory.copy())

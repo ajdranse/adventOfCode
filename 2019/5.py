@@ -75,7 +75,7 @@ def run(memory, input_val):
 #     run(case.copy(), 8)
 #     run(case.copy(), 9)
 
-with open('input') as f:
+with open('5.in') as f:
     memory = [int(x.strip()) for x in f.read().split(',')]
     print('part 1')
     run(memory.copy(), 1)
