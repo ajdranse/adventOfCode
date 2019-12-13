@@ -1,6 +1,25 @@
 from threading import Thread
 
 
+def print_grid(grid, val_map):
+    '''prints a grid, where the grid is a dict of (x, y) to 1/0 values.  1 is painted white, 0 is black.
+        0 is an empty tile. No game object appears in this tile.
+        1 is a wall tile. Walls are indestructible barriers.
+        2 is a block tile. Blocks can be broken by the ball.
+        3 is a horizontal paddle tile. The paddle is indestructible.
+        4 is a ball tile. The ball moves diagonally and bounces off objects.
+    '''
+    outs = ''
+    for y in range(max(grid, key=lambda g: g[1])[1] + 1):
+        for x in range(max(grid, key=lambda g: g[0])[0] + 1):
+            if (x, y) in grid:
+                outs += val_map[grid[(x, y)]]
+            else:
+                outs += val_map[0]
+        outs += '\n'
+    print(outs)
+
+
 class IntCode(Thread):
     def __init__(self, memory, input_queue, output_queue):
         super(IntCode, self).__init__()

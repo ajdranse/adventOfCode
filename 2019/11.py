@@ -1,21 +1,5 @@
 from queue import Queue
-from intcode import IntCode
-
-
-def print_grid(grid):
-    '''prints a grid, where the grid is a dict of (x, y) to 1/0 values.  1 is painted white, 0 is black.'''
-    outs = ''
-    for y in range(max(grid, key=lambda g: g[1])[1] + 1):
-        for x in range(max(grid, key=lambda g: g[0])[0] + 1):
-            if (x, y) in grid:
-                if grid[(x, y)]:
-                    outs += '##'
-                else:
-                    outs += '  '
-            else:
-                outs += '  '
-        outs += '\n'
-    print(outs)
+from intcode import IntCode, print_grid
 
 
 def run_robot(facing, pos, colour):
@@ -47,4 +31,4 @@ with open('11.in') as f:
     print('part 2')
     grid = run_robot(3, (0, 0), 1)
     print(len(grid.keys()))
-    print_grid(grid)
+    print_grid(grid, {0: '  ', 1: '##'})

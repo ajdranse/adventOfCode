@@ -1,35 +1,5 @@
 from queue import Queue
-from intcode import IntCode
-
-
-def print_grid(grid):
-    '''prints a grid, where the grid is a dict of (x, y) to 1/0 values.  1 is painted white, 0 is black.
-        0 is an empty tile. No game object appears in this tile.
-        1 is a wall tile. Walls are indestructible barriers.
-        2 is a block tile. Blocks can be broken by the ball.
-        3 is a horizontal paddle tile. The paddle is indestructible.
-        4 is a ball tile. The ball moves diagonally and bounces off objects.
-    '''
-    outs = ''
-    outs += str(grid[(-1, 0)]) + '\n'
-    for y in range(max(grid, key=lambda g: g[1])[1] + 1):
-        for x in range(max(grid, key=lambda g: g[0])[0] + 1):
-            if (x, y) in grid:
-                if grid[(x, y)] == 1:
-                    outs += '█'
-                elif grid[(x, y)] == 2:
-                    outs += '#'
-                elif grid[(x, y)] == 3:
-                    outs += '-'
-                elif grid[(x, y)] == 4:
-                    outs += 'o'
-                else:
-                    outs += ' '
-            else:
-                outs += ' '
-        outs += '\n'
-    print(outs)
-
+from intcode import print_grid, IntCode
 
 with open('13.in') as f:
     memory = [int(x.strip()) for x in f.read().split(',')]
@@ -49,6 +19,8 @@ with open('13.in') as f:
         if tile == 2:
             blocks += 1
     print('part 1: ', blocks)
+
+grid_values = {0: ' ', 1: '█', 2: '#', 3: '-', 4: 'o'}
 
 with open('13.in') as f:
     memory = [int(x.strip()) for x in f.read().split(',')]
@@ -77,7 +49,7 @@ with open('13.in') as f:
                     inq.put(-1)
                 elif ball_pos[0] > paddle_pos[0]:
                     inq.put(1)
-                print_grid(grid)
+                print_grid(grid, grid_values)
         elif i == 3:
             # paddle
             paddle_pos = (x, y)
@@ -86,4 +58,5 @@ with open('13.in') as f:
     while not outq.empty():
         (x, y, i) = (outq.get(), outq.get(), outq.get())
         grid[(x, y)] = i
-    print_grid(grid)
+    print_grid(grid, grid_values)
+    print(grid[(-1, 0)])
