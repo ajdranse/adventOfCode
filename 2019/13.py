@@ -11,11 +11,12 @@ def print_grid(grid):
         4 is a ball tile. The ball moves diagonally and bounces off objects.
     '''
     outs = ''
+    outs += str(grid[(-1, 0)]) + '\n'
     for y in range(max(grid, key=lambda g: g[1])[1] + 1):
         for x in range(max(grid, key=lambda g: g[0])[0] + 1):
             if (x, y) in grid:
                 if grid[(x, y)] == 1:
-                    outs += 'w'
+                    outs += '█'
                 elif grid[(x, y)] == 2:
                     outs += '#'
                 elif grid[(x, y)] == 3:
@@ -27,7 +28,6 @@ def print_grid(grid):
             else:
                 outs += ' '
         outs += '\n'
-    outs += str(grid[(-1, 0)]) + '\n'
     print(outs)
 
 
