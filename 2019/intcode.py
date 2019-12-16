@@ -6,8 +6,8 @@ def print_grid(grid, val_map):
         uses provided map to determine what to print.
     '''
     outs = ''
-    for y in range(max(grid, key=lambda g: g[1])[1] + 1):
-        for x in range(max(grid, key=lambda g: g[0])[0] + 1):
+    for y in range(min(grid, key=lambda g: g[1])[1], max(grid, key=lambda g: g[1])[1] + 1):
+        for x in range(min(grid, key=lambda g: g[0])[0], max(grid, key=lambda g: g[0])[0] + 1):
             if (x, y) in grid:
                 outs += val_map[grid[(x, y)]]
             else:
