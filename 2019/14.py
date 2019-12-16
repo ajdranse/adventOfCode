@@ -1,48 +1,46 @@
 from collections import defaultdict
-from math import floor
 
 
-def get_inputs(wanted, wanted_amt, surplus, recipes):
-    result = []
-    if wanted in surplus:
-        surplus_amt = surplus[wanted]
-        if surplus_amt > wanted_amt:
-            surplus[wanted] -= wanted_amt
-            return []
-        elif surplus_amt == wanted_amt:
-            del surplus[wanted]
-            return []
+def get_fuel(wanted_amt, recipes):
+    needed = {'FUEL': wanted_amt}
+    surplus = defaultdict(int)
+    while True:
+        try:
+            # print('needed: ', needed)
+            # print('surplus: ', surplus)
+            making = next(n for n in needed if n != 'ORE')
+            # print('making {}'.format(making))
+        except StopIteration:
+            break
+        amt_made, inputs = recipes[making]
+        # print('make {} from {}'.format(amt_made, inputs))
+        times, remainder = divmod(needed[making], amt_made)
+        if remainder == 0:
+            # exact
+            del needed[making]
         else:
-            wanted_amt -= surplus[wanted]
-            del surplus[wanted]
-    if wanted in recipes:
-        wanted_recipe = recipes[wanted]
-        if len(wanted_recipe) > 1:
-            raise Exception('more than one way to make ', wanted)
-        amt_made = list(wanted_recipe.keys())[0]
-        ingredients = wanted_recipe[amt_made]
-        if amt_made < wanted_amt:
-            # need to make multiple times
-            result.extend(get_inputs(wanted, wanted_amt - amt_made, surplus, recipes))
-            for i in ingredients:
-                result.extend(get_inputs(i[0], i[1], surplus, recipes))
-        elif amt_made > wanted_amt:
-            # need to make once, have surplus
-            for i in ingredients:
-                result.extend(get_inputs(i[0], i[1], surplus, recipes))
-            surplus[wanted] = amt_made - wanted_amt
-        else:
-            # equals
-            for i in ingredients:
-                result.extend(get_inputs(i[0], i[1], surplus, recipes))
-    else:
-        result.append((wanted, wanted_amt))
-    return result
+            del needed[making]
+            surplus[making] = amt_made - remainder
+            times += 1  # to account for remainder
+
+        # print('need to make {} times'.format(times))
+
+        for amt, ingredient in inputs:
+            # already needed + amount for this - surplus
+            already = needed.get(ingredient, 0)
+            forthis = amt * times
+            surplus_amt = surplus[ingredient]
+            if already + forthis - surplus_amt > 0:
+                needed[ingredient] = already + forthis - surplus_amt
+                del surplus[ingredient]
+            else:
+                surplus[ingredient] -= already + forthis
+            # print('need {} of {}'.format(needed.get(ingredient, 0), ingredient))
+    return needed['ORE']
 
 
-def get_root_ingredients(filename):
+def get_recipes(filename):
     recipes = defaultdict(dict)
-    ore_recipes = defaultdict(dict)
     print(filename)
     with open(filename) as f:
         lines = [x.strip() for x in f.readlines()]
@@ -52,67 +50,34 @@ def get_root_ingredients(filename):
             inputs = []
             for i in lhs.split(', '):
                 split = i.split(' ')
-                if split[1] == 'ORE':
-                    ore_recipes[output[1]][int(output[0])] = (split[1], int(split[0]))
-                else:
-                    inputs.append((split[1], int(split[0])))
+                inputs.append((int(split[0]), split[1]))
 
-            if len(inputs) > 0:
-                recipes[output[1]][int(output[0])] = inputs
-
-    result = get_inputs('FUEL', 1, {}, recipes)
-    ingredients = defaultdict(int)
-    for r in result:
-        i = r[0]
-        amt = r[1]
-        ingredients[i] += amt
-    # print(ingredients)
-    return ingredients, ore_recipes
-
-
-def make_one_fuel(ingredients, surplus, ore_recipes):
-    ore = 0
-    for ingredient, amt_needed in ingredients.items():
-        if ingredient in surplus:
-            surplus_amt = surplus[ingredient]
-            if surplus_amt > amt_needed:
-                surplus[ingredient] -= amt_needed
-                next
-            else:
-                amt_needed -= surplus[ingredient]
-                del surplus[ingredient]
-
-        # print('need {} {}, recipe {}'.format(amt_needed, ingredient, ore_recipes[ingredient]))
-        recipe = ore_recipes[ingredient]
-        while amt_needed > 0:
-            amt_made = list(recipe.keys())[0]
-            amt_needed -= amt_made
-            ore += recipe[amt_made][1]
-        surplus[ingredient] += abs(amt_needed)
-    return ore
+            recipes[output[1]] = (int(output[0]), inputs)
+    return recipes
 
 
 def run(filename):
-    root_ingredients, ore_recipes = get_root_ingredients(filename)
-    surplus = defaultdict(int)
-    print(make_one_fuel(root_ingredients, surplus, ore_recipes))
+    recipes = get_recipes(filename)
+    print(get_fuel(1, recipes))
 
 
-def run2(filename, amount_of_ore):
-    root_ingredients, ore_recipes = get_root_ingredients(filename)
-    surplus = defaultdict(int)
-    states = []
-    while True:
-        ore = make_one_fuel(root_ingredients, surplus, ore_recipes)
-        if ((ore, surplus) in states):
-            ore_in_cycle = sum(s[0] for s in states)
-            fuel_in_cycle = len(states)
-            print('seen this state before: ', (ore, surplus))
-            print('makes {} fuel, uses {} ore'.format(fuel_in_cycle, ore_in_cycle))
-            break
+def run2(filename, target):
+    recipes = get_recipes(filename)
+    lo = 0
+    hi = 1
+    ore = 0
+    while ore < target:
+        lo, hi = hi, hi*10
+        ore = get_fuel(hi, recipes)
+
+    while hi-lo > 1:
+        mid = (lo + hi) // 2
+        ore = get_fuel(mid, recipes)
+        if ore > target:
+            hi = mid
         else:
-            states.append((ore, surplus.copy()))
-    print(floor(amount_of_ore // ore_in_cycle) * fuel_in_cycle)
+            lo = mid
+    return mid
 
 
 run('14.test')
@@ -124,8 +89,11 @@ print('part 1: ')
 run('14.in')
 print('')
 
-run2('14.test.3', 1000000000000)
-run2('14.test.4', 1000000000000)
-run2('14.test.5', 1000000000000)
-print('part 2:')
-run2('14.in', 1000000000000)
+print(run2('14.test.3', 1e12))
+print(run2('14.test.4', 1e12))
+print(run2('14.test.5', 1e12))
+part2 = run2('14.in', 1e12)
+for i in range(part2-2, part2+3):
+    ore = get_fuel(i, get_recipes('14.in'))
+    print(i, ore)
+# print('part 2: ', part2)
