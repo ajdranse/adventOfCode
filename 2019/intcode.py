@@ -9,9 +9,15 @@ def print_grid(grid, val_map):
     for y in range(min(grid, key=lambda g: g[1])[1], max(grid, key=lambda g: g[1])[1] + 1):
         for x in range(min(grid, key=lambda g: g[0])[0], max(grid, key=lambda g: g[0])[0] + 1):
             if (x, y) in grid:
-                outs += val_map[grid[(x, y)]]
+                if val_map:
+                    outs += val_map[grid[(x, y)]]
+                else:
+                    outs += grid[(x, y)]
             else:
-                outs += val_map[0]
+                if val_map:
+                    outs += val_map[0]
+                else:
+                    outs += ' '
         outs += '\n'
     print(outs)
 

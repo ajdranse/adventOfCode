@@ -72,9 +72,7 @@ def walk(grid, pos, direction):
                     break
         else:
             # no turn found, so we must be done
-            print('intersections: ', intersections)
-            print('moves: ', moves)
-            return intersections
+            return intersections, moves
 
 
 with open('17.in') as f:
@@ -92,7 +90,9 @@ with open('17.in') as f:
     grid = to_grid(scaffolds)
     robot_pos = None
     robot_pos = [(x, y) for (x, y), c in grid.items() if c in ['v', '^', '<', '>']][0]
-    intersections = walk(grid, robot_pos, grid[robot_pos])
+    intersections, moves = walk(grid, robot_pos, grid[robot_pos])
+    print(intersections)
+    print(moves)
     print('part1:', sum(i[0] * i[1] for i in intersections))
 
     # hand made the move functions
