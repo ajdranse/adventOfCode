@@ -14,23 +14,36 @@ outqs = [Queue() for _ in range(50)]
 computers = []
 for i in range(50):
     t = IntCode(memory.copy(), inqs[i], outqs[i], False)
-    t.start()
     computers.append(t)
+    inqs[i].put(i)
 
+trying_to_read = [0 for _ in range(50)]
+nat = None
 done = False
+last_y_nat = None
 while not done:
-    for q in outqs:
-        if not q.empty():
-            to = q.get()
-            x = q.get()
-            y = q.get()
-            print(to, x, y)
-            if to == 255:
-                print(x, y)
-                done = True
-                break
-            inqs[to].put(x)
-            inqs[to].put(y)
+    for i in range(50):
+        op = computers[i].tick()
+        if op == 3:
+            trying_to_read[i] += 1
+        elif op == 4:
+            trying_to_read[i] = 0
 
-for i in range(50):
-    computers[i].join()
+        if outqs[i].qsize() == 3:
+            to = outqs[i].get()
+            x = outqs[i].get()
+            y = outqs[i].get()
+            if to == 255:
+                nat = (x, y)
+            else:
+                inqs[to].put(x)
+                inqs[to].put(y)
+    if all(q.empty() for q in inqs) and all(x > 150 for x in trying_to_read):
+        trying_to_read = [0 for _ in range(50)]
+        inqs[0].put(nat[0])
+        inqs[0].put(nat[1])
+        print('sent', nat[1])
+        if nat[1] == last_y_nat:
+            print(nat[1])
+            done = True
+        last_y_nat = nat[1]

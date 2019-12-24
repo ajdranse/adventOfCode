@@ -1,4 +1,5 @@
 from threading import Thread
+import queue
 
 
 def print_grid(grid, val_map):
@@ -23,15 +24,16 @@ def print_grid(grid, val_map):
 
 
 class IntCode(Thread):
-    def __init__(self, memory, input_queue, output_queue):
+    def __init__(self, memory, input_queue, output_queue, block=False):
         super(IntCode, self).__init__()
         self.memory = memory
-        self.opcode = 0
         self.modes = []
         self.ip = 0
         self.input_queue = input_queue
         self.output_queue = output_queue
         self.relative_base = 0
+        self.opcode = self.get(self.ip)
+        self.block = block
 
     def get(self, idx):
         if idx < 0:
@@ -84,7 +86,10 @@ class IntCode(Thread):
 
     def input(self):
         first = self.get_addresses(1)[0]
-        val = self.input_queue.get()
+        try:
+            val = self.input_queue.get(self.block)
+        except queue.Empty:
+            val = -1
         self.set(first, val)
         self.ip += 2
 
@@ -122,29 +127,33 @@ class IntCode(Thread):
         self.relative_base += self.get(first)
         self.ip += 2
 
-    def run(self):
+    def tick(self):
+        self.parse_opcode()
+        if self.opcode == 1:  # add
+            self.add()
+        elif self.opcode == 2:  # mult
+            self.mult()
+        elif self.opcode == 3:  # input
+            self.input()
+        elif self.opcode == 4:  # output
+            self.output()
+        elif self.opcode == 5:  # jump-if-true
+            self.jump_if_true()
+        elif self.opcode == 6:  # jump-if-false
+            self.jump_if_false()
+        elif self.opcode == 7:  # less-than
+            self.lt()
+        elif self.opcode == 8:  # equals
+            self.eq()
+        elif self.opcode == 9:  # update relative base
+            self.update_relative_base()
+        else:
+            print('Error, unknown opcode: {}'.format(self.opcode))
+            return
+        this_op = self.opcode
         self.opcode = self.get(self.ip)
+        return this_op
+
+    def run(self):
         while self.opcode != 99:
-            self.parse_opcode()
-            if self.opcode == 1:  # add
-                self.add()
-            elif self.opcode == 2:  # mult
-                self.mult()
-            elif self.opcode == 3:  # input
-                self.input()
-            elif self.opcode == 4:  # output
-                self.output()
-            elif self.opcode == 5:  # jump-if-true
-                self.jump_if_true()
-            elif self.opcode == 6:  # jump-if-false
-                self.jump_if_false()
-            elif self.opcode == 7:  # less-than
-                self.lt()
-            elif self.opcode == 8:  # equals
-                self.eq()
-            elif self.opcode == 9:  # update relative base
-                self.update_relative_base()
-            else:
-                print('Error, unknown opcode: {}'.format(self.opcode))
-                break
-            self.opcode = self.get(self.ip)
+            self.tick()
