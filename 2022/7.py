@@ -15,6 +15,18 @@ class Directory(NodeMixin):
             size += c.get_size()
         return size
 
+    def get_child_names(self):
+        return [x.name for x in self.children]
+
+    def get_children(self):
+        return self.children
+
+    def get_child(self, name):
+        for c in self.children:
+            if c.name == name:
+                return c
+        return None
+
 
 class File(NodeMixin):
     def __init__(self, name, size, parent=None):
@@ -33,24 +45,33 @@ with open('7.in') as f:
 
 head = Directory('/')
 curdir = head
+curcmd = None
 for line in lines:
     parts = line.split(' ')
     if line.startswith('$'):
         # new command
         if parts[1] == 'cd':
+            curcmd = 'cd'
             if parts[2] == '/':
                 curdir = head
             elif parts[2] == '..':
                 curdir = curdir.parent
             else:
-                newdir = Directory(parts[2], parent=curdir)
+                newdir = curdir.get_child(parts[2])
+                if newdir is None:
+                    newdir = Directory(parts[2], parent=curdir)
                 curdir = newdir
         elif parts[1] == 'ls':
-            pass
+            curcmd = 'ls'
         else:
             raise Exception(f'Error unknown command {parts[1]}')
-    if line[0].isdigit():
-        file = File(parts[1], int(parts[0]), parent=curdir)
+    elif curcmd == 'ls':
+        if line[0].isdigit():
+            file = curdir.get_child(parts[1])
+            if file is None:
+                file = File(parts[1], int(parts[0]), parent=curdir)
+        elif line.startswith('dir '):
+            pass
 
 total = 0
 for node in LevelOrderIter(head):
