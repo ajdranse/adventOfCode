@@ -49,10 +49,10 @@ def part1(disk):
     while gaps(disk):
         (last_digit_end_idx, last_digit_start_idx) = lastdigit(disk)
         (first_empty_start_idx, first_empty_end_idx) = firstempty(disk)
-        if iterations % 10 == 0:
-            print(iterations)
-            print('last digits: ', last_digit_start_idx, last_digit_end_idx, disk[last_digit_start_idx+1:last_digit_end_idx])
-            print('first empty: ', first_empty_start_idx, first_empty_end_idx, disk[first_empty_start_idx:first_empty_end_idx-1])
+        # if iterations % 10 == 0:
+        #     print(iterations)
+        #     print('last digits: ', last_digit_start_idx, last_digit_end_idx, disk[last_digit_start_idx+1:last_digit_end_idx])
+        #     print('first empty: ', first_empty_start_idx, first_empty_end_idx, disk[first_empty_start_idx:first_empty_end_idx-1])
 
         length = min((last_digit_end_idx - last_digit_start_idx), (first_empty_end_idx - first_empty_start_idx))
         disk[first_empty_start_idx:first_empty_start_idx + length] = disk[last_digit_end_idx:last_digit_end_idx - length:-1]
@@ -65,7 +65,7 @@ def part1(disk):
 def part2(disk):
     next_file_id = int(disk[-1])
     while next_file_id >= 0:
-        print(f'{next_file_id=}')
+        # print(f'{next_file_id=}')
         (file_start, file_end) = findfile(disk, next_file_id)
         file_len = file_end - file_start
         # print(f'{next_file_id=}, {file_len=}, {file_start=}, {file_end=}')
@@ -105,5 +105,5 @@ def parse():
 
 if __name__ == '__main__':
     disk = parse()
-    # part1(disk.copy())
+    part1(disk.copy())
     part2(disk.copy())
